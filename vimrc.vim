@@ -1,5 +1,6 @@
 execute pathogen#infect()
 
+set noswapfile
 " ********** Whitespace **********
 
 :set nowrap
@@ -37,7 +38,7 @@ execute pathogen#infect()
 :set guioptions-=r  "remove right-hand scroll bar
 
 :set guifont=Inconsolata:h18
-colorscheme Tomorrow-Night-Custom
+colorscheme molokai
 
 " ********* Ack (Silver Searcher)************
 :map <Leader>f :Ag<space>
@@ -75,3 +76,7 @@ function! GoodMatch(items, str, limit, mmode, ispath, crfile, regex)
   return split(system(cmd), "\n")
 
 endfunction
+
+" Cucumber Plugin
+
+filetype plugin indent on
