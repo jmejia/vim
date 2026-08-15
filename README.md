@@ -1,6 +1,18 @@
 vim
 ===
 
+> **This branch is archived.** The active configuration is Neovim, on the
+> [`main`](https://github.com/jmejia/vim/tree/main) branch.
+>
+> ```sh
+> git clone https://github.com/jmejia/vim.git ~/.config/nvim
+> ```
+>
+> Setup instructions live in `SETUP.md` there. The contents of `master` are
+> the pathogen-era Vim config, last touched in 2014, kept for reference only.
+
+---
+
 Vim configuration for sharing between multiple machines using Dropbox.
 
 ### Dependencies
