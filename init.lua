@@ -260,14 +260,14 @@ do
   vim.o.autoread = true
   vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'TermLeave', 'TermClose' }, {
     desc = 'Reload buffer if the underlying file changed on disk',
-    group = vim.api.nvim_create_augroup('josh-autoread', { clear = true }),
+    group = vim.api.nvim_create_augroup('custom-autoread', { clear = true }),
     callback = function()
       if vim.fn.getcmdwintype() == '' then vim.cmd 'checktime' end
     end,
   })
   vim.api.nvim_create_autocmd('FileChangedShellPost', {
     desc = 'Notify when a buffer was reloaded after an external change',
-    group = vim.api.nvim_create_augroup('josh-autoread-notify', { clear = true }),
+    group = vim.api.nvim_create_augroup('custom-autoread-notify', { clear = true }),
     callback = function() vim.notify('File changed on disk; buffer reloaded', vim.log.levels.INFO) end,
   })
 end

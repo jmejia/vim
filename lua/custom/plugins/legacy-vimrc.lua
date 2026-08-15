@@ -3,7 +3,7 @@
 --
 -- The settings worth keeping, modernized. Kept in this file rather than in
 -- init.lua so the kickstart base stays close to upstream and future merges
--- on the `josh` branch stay clean. This loads last (via `require
+-- on the `main` branch stay clean. This loads last (via `require
 -- 'custom.plugins'` in Section 10), so anything here wins over kickstart.
 --
 -- Deliberately NOT ported:
@@ -38,7 +38,7 @@ vim.o.softtabstop = 4
 -- is itself Lua and the project carries a lot of markdown. Trim freely.
 vim.api.nvim_create_autocmd('FileType', {
   desc = 'Two-space indentation for languages that expect it',
-  group = vim.api.nvim_create_augroup('josh-indent', { clear = true }),
+  group = vim.api.nvim_create_augroup('custom-indent', { clear = true }),
   pattern = { 'ruby', 'eruby', 'yaml', 'lua', 'json', 'jsonc', 'markdown' },
   callback = function()
     vim.bo.shiftwidth = 2

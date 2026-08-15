@@ -158,7 +158,7 @@ squiggles CI does not care about, and vice versa.
 | `files.lua` | oil.nvim — edit the filesystem as a buffer |
 | `git.lua` | fugitive, diffview, and a lazygit floating window |
 | `claude.lua` | claudecode.nvim bridge and its keymaps |
-| `josh-vimrc.lua` | settings and keymaps ported from the old vimrc |
+| `legacy-vimrc.lua` | settings and keymaps ported from the old vimrc |
 
 ## Cheatsheet (leader = Space)
 
