@@ -5,10 +5,15 @@ nvim
 
 spell/
 
-# In your personal fork, you likely want to comment this, since it's recommended to track
-# nvim-pack-lock.json in version control - see :help vim.pack-lockfile
-# For the official `nvim-lua/kickstart.nvim` git repository, we leave it ignored to avoid unneeded
-# merge conflicts.
-nvim-pack-lock.json
+# nvim-pack-lock.json IS tracked in this fork. Upstream kickstart ignores it to
+# avoid merge conflicts; a personal fork wants it -- see :help vim.pack-lockfile.
+# It pins every plugin to an exact rev, so both machines end up on identical
+# versions instead of whatever HEAD happened to be at clone time.
+# nvim-pack-lock.json
+
+# Machine-specific overrides. lua/custom/plugins/init.lua auto-loads every .lua
+# file in that directory, so this is the seam for anything that shouldn't be
+# shared between machines.
+lua/custom/plugins/local.lua
 
 .DS_Store
