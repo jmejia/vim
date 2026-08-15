@@ -1065,7 +1065,7 @@ do
   -- require 'kickstart.plugins.indent_line'
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
-  -- require 'kickstart.plugins.neo-tree'
+  require 'kickstart.plugins.neo-tree' -- sidebar file tree on \ ; complements oil on -
   require 'kickstart.plugins.gitsigns' -- hunk nav/stage/reset keymaps under <leader>h
 
   -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`

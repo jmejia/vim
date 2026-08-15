@@ -151,6 +151,16 @@ Type checking is deliberately set to `basic`. `uv run mypy .` is the authority
 in the project pipeline; two full-strength type checkers disagreeing produces
 squiggles CI does not care about, and vice versa.
 
+## Two file explorers, on purpose
+
+They solve different problems and coexist happily.
+
+- **neo-tree** (`\`) — the NERDTree/VS Code-style sidebar. A persistent tree
+  for *seeing* project structure and orienting in unfamiliar code.
+- **oil** (`-` or `<Space>e`) — opens a directory as an editable buffer.
+  Rename by editing a line, `dd` to delete, type a line to create, `:w` to
+  apply. Far better for *changing* structure, especially bulk renames.
+
 ## What's in `lua/custom/plugins/`
 
 | File | What |
@@ -171,6 +181,7 @@ all keymaps.
 | `<Space>b` | buffers (old `<Leader>b`) |
 | `<Space>sf` / `<Space>sg` | find files / live grep (Telescope) |
 | `<Space><Space>` | open buffers |
+| `\` | sidebar file tree (neo-tree); `\` again closes it |
 | `-` | file explorer (oil): edit dirs like text, `:w` applies |
 | `<Space>e` | oil, from the old `<Leader>e` |
 | `<Space>v` / `<Space>-` | vertical / horizontal split |
