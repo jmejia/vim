@@ -1,3 +1,27 @@
+# Josh's Neovim config
+
+**Setting up a machine? Read [`SETUP.md`](SETUP.md), not this file.**
+
+```sh
+git clone https://github.com/jmejia/vim.git ~/.config/nvim
+```
+
+A fork of [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) with
+Claude Code integration, git review tooling, and settings carried over from the
+old pathogen-era vimrc. Personal additions live in `lua/custom/plugins/`; the
+rest of `init.lua` is kickstart with marked edits.
+
+`SETUP.md` covers prerequisites, install steps, verification, the per-machine
+language server differences between the personal and work machines, and the
+keymap cheatsheet.
+
+The pre-2015 Vim config this repo used to hold is archived on the
+[`master`](https://github.com/jmejia/vim/tree/master) branch.
+
+---
+
+Everything below is kickstart's own documentation, kept as-is.
+
 # kickstart.nvim
 
 ## Introduction
