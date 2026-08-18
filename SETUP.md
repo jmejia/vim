@@ -69,10 +69,10 @@ cd ~/.config/nvim
 git remote add upstream https://github.com/nvim-lua/kickstart.nvim.git
 ```
 
-### 4. Adjust language servers for this machine
+### 4. Language servers
 
-See "Per-machine differences" below **before** the next step, so Mason
-installs the right set the first time.
+Nothing to adjust: every machine runs the identical config (see "One config,
+every machine" below). Mason installs the full server set in the next step.
 
 ### 5. Install everything
 
@@ -91,7 +91,7 @@ nvim --headless "+lua print('BOOT OK')" +qa!
 nvim --headless "+MasonToolsInstallSync" +qa!
 
 # 4. Treesitter parsers (match this list to `parsers` in Section 9)
-nvim --headless "+lua require('nvim-treesitter').install({'bash','c','diff','html','lua','luadoc','markdown','markdown_inline','query','vim','vimdoc','python','toml','csv','sql','ruby','embedded_template','json','yaml','dockerfile'}):wait(300000)" +qa!
+nvim --headless "+lua require('nvim-treesitter').install({'bash','c','diff','html','lua','luadoc','markdown','markdown_inline','query','vim','vimdoc','python','toml','csv','sql','ruby','embedded_template','javascript','typescript','tsx','css','scss','json','yaml','dockerfile'}):wait(300000)" +qa!
 ```
 
 ### 6. Verify
@@ -114,31 +114,18 @@ errors are not. The `blink_cmp_fuzzy lib is not downloaded/built` warning is
 also expected — kickstart sets `fuzzy = { implementation = 'lua' }` on
 purpose to avoid requiring a Rust toolchain.
 
-## Per-machine differences
+## One config, every machine
 
-The two machines run different stacks. Everything else is shared; only the
-language servers differ.
+The machines run different stacks (personal: Python + Ruby; work: Ruby +
+TypeScript/React), but the config enables the **union** of all of it
+everywhere. LSP servers, formatters, and parsers only activate for matching
+filetypes, so an unused stack costs nothing beyond its one-time Mason
+install. In exchange, the tracked files never need per-machine edits and
+`git pull` is the whole sync story.
 
-| | Personal | Work |
-|---|---|---|
-| Python (`basedpyright`, `ruff`) | on | off |
-| Ruby (`ruby_lsp`) | on | on |
-| TypeScript / React (`vtsls`, `eslint`, `tailwindcss`) | off | **on** |
-
-To turn TypeScript/React on, uncomment three marked blocks:
-
-1. **Section 6** — the `vtsls` / `eslint` / `tailwindcss` entries in `servers`
-2. **Section 7** — the `javascript` / `typescript` / `css` lines in
-   `formatters_by_ft`
-3. **Section 9** — the JS parsers in the `parsers` list
-
-Then re-run steps 5.3 and 5.4. Each block is commented with a pointer back
-here.
-
-If the machines diverge further, the cleaner pattern is an untracked
-`lua/custom/plugins/local.lua` (gitignored) holding machine-specific
-overrides, since `lua/custom/plugins/init.lua` auto-loads every `.lua` file in
-that directory.
+If a genuinely machine-specific override is ever needed, add an untracked
+`lua/custom/plugins/local.lua` (gitignored): `lua/custom/plugins/init.lua`
+auto-loads every `.lua` file in that directory.
 
 ## Python and `uv`
 
@@ -168,6 +155,7 @@ They solve different problems and coexist happily.
 | `files.lua` | oil.nvim — edit the filesystem as a buffer |
 | `git.lua` | fugitive, diffview, and a lazygit floating window |
 | `claude.lua` | claudecode.nvim bridge and its keymaps |
+| `markdown.lua` | render-markdown.nvim — styled in-buffer markdown |
 | `legacy-vimrc.lua` | settings and keymaps ported from the old vimrc |
 
 ## Cheatsheet (leader = Space)
@@ -195,6 +183,7 @@ all keymaps.
 | `<Space>gd` | side-by-side review of the whole working-tree diff |
 | `<Space>gg` | lazygit floating window |
 | `<Space>tb` / `<Space>tw` / `<Space>th` | toggle blame line / word diff / inlay hints |
+| `<Space>tm` | toggle in-buffer markdown rendering |
 
 **Bridge tip:** a Claude Code session already running in a separate terminal
 can attach to Neovim by typing `/ide` inside Claude Code. Run both from the

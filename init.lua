@@ -99,6 +99,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
+  -- (Ghostty bundles Nerd Font symbols as a built-in fallback, so this is safe)
   vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
@@ -390,6 +391,8 @@ do
     spec = {
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
+      { '<leader>a', group = '[A]I (Claude)', mode = { 'n', 'v' } },
+      { '<leader>g', group = '[G]it' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
       { '<leader>a', group = '[A]I (Claude)', mode = { 'n', 'v' } },
@@ -761,15 +764,21 @@ do
     -- default, so it is intentionally absent from conform's table below.
     ruby_lsp = {},
 
-    -- [[ TypeScript / React ]] Uncomment on machines with a JS stack (the
-    -- work machine). Also uncomment the matching prettierd filetypes in
-    -- Section 7 and the parsers in Section 9. Left off here because this
-    -- machine has no JS project. See SETUP.md, "Per-machine differences".
-    -- vtsls = {},
-    -- eslint = {},
-    -- tailwindcss = {},
+    -- [[ TypeScript / React ]] Enabled everywhere: servers only attach to
+    -- matching filetypes, so on a machine with no JS projects the only cost
+    -- is the one-time Mason install. Keeping every machine identical means
+    -- the config never needs per-machine edits (see SETUP.md).
+    vtsls = {},
+    eslint = {},
+    tailwindcss = {},
 
     stylua = {}, -- Used to format Lua code
+
+    -- Homebot stack
+    ruby_lsp = {}, -- Ruby/Rails (mikasa). Needs a Ruby on PATH; installed via asdf.
+    vtsls = {}, -- TypeScript/React (customer-admin, clients-frontend-v2)
+    eslint = {},
+    tailwindcss = {},
 
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
@@ -829,7 +838,7 @@ do
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
     -- You can add other tools here that you want Mason to install
-    'prettierd', -- formats json/yaml/markdown (no JS stack on this machine)
+    'prettierd', -- fast prettier daemon: JS/TS plus json/yaml/markdown
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -870,8 +879,14 @@ do
       -- the same binary, so they run in sequence with no extra dependency.
       python = { 'ruff_organize_imports', 'ruff_format' },
 
-      -- [[ Docs and config ]] No JS stack on this machine, so prettierd is
-      -- here only for these filetypes.
+      -- [[ TypeScript / React ]]
+      javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+      typescript = { 'prettierd', 'prettier', stop_after_first = true },
+      typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+      css = { 'prettierd', 'prettier', stop_after_first = true },
+
+      -- [[ Docs and config ]]
       json = { 'prettierd', 'prettier', stop_after_first = true },
       jsonc = { 'prettierd', 'prettier', stop_after_first = true },
       yaml = { 'prettierd', 'prettier', stop_after_first = true },
@@ -879,14 +894,6 @@ do
 
       -- Ruby intentionally omitted: ruby-lsp formats via RuboCop through the
       -- `lsp_format = 'fallback'` default above.
-
-      -- [[ TypeScript / React ]] Uncomment alongside the vtsls/eslint block
-      -- in Section 6 on machines with a JS stack.
-      -- javascript = { 'prettierd', 'prettier', stop_after_first = true },
-      -- javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
-      -- typescript = { 'prettierd', 'prettier', stop_after_first = true },
-      -- typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
-      -- css = { 'prettierd', 'prettier', stop_after_first = true },
     },
   }
 
@@ -993,12 +1000,12 @@ do
     'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
     -- Python / data stack
     'python', 'toml', 'csv', 'sql',
-    -- Ruby (Commish today, the DFS web layer from October)
+    -- Ruby (Homebot mikasa; Commish today, the DFS web layer from October)
     'ruby', 'embedded_template', -- embedded_template covers ERB
+    -- TypeScript / React (Homebot customer-admin, clients-frontend-v2)
+    'javascript', 'typescript', 'tsx', 'css', 'scss',
     -- Config and infra
     'json', 'yaml', 'dockerfile',
-    -- TypeScript / React: uncomment on machines with a JS stack
-    -- 'javascript', 'typescript', 'tsx', 'css', 'scss',
   }
   require('nvim-treesitter').install(parsers)
 
@@ -1068,10 +1075,11 @@ do
   require 'kickstart.plugins.neo-tree' -- sidebar file tree on \ ; complements oil on -
   require 'kickstart.plugins.gitsigns' -- hunk nav/stage/reset keymaps under <leader>h
 
-  -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  require 'custom.plugins' -- files.lua (oil), git.lua (fugitive/diffview/lazygit), claude.lua
+  -- Josh's own plugins, one file each in lua/custom/plugins/:
+  -- files.lua (oil), git.lua (fugitive/diffview/lazygit), claude.lua
+  -- (claudecode.nvim bridge), markdown.lua (render-markdown),
+  -- legacy-vimrc.lua (options/keymaps ported from the old vimrc)
+  require 'custom.plugins'
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
