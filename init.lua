@@ -99,7 +99,8 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  -- (Ghostty bundles Nerd Font symbols as a built-in fallback, so this is safe)
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -251,6 +252,25 @@ do
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
   })
+
+  -- [[ Auto-reload files changed on disk ]]
+  -- Essential for agent workflows: when Claude Code (or git) edits a file you
+  -- have open, the buffer refreshes instead of going stale. `autoread` alone
+  -- only checks on a few rare events, so we also run `checktime` on the
+  -- events below to actually detect the change.
+  vim.o.autoread = true
+  vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'TermLeave', 'TermClose' }, {
+    desc = 'Reload buffer if the underlying file changed on disk',
+    group = vim.api.nvim_create_augroup('josh-autoread', { clear = true }),
+    callback = function()
+      if vim.fn.getcmdwintype() == '' then vim.cmd 'checktime' end
+    end,
+  })
+  vim.api.nvim_create_autocmd('FileChangedShellPost', {
+    desc = 'Notify when a buffer was reloaded after an external change',
+    group = vim.api.nvim_create_augroup('josh-autoread-notify', { clear = true }),
+    callback = function() vim.notify('File changed on disk; buffer reloaded', vim.log.levels.INFO) end,
+  })
 end
 
 -- ============================================================
@@ -371,6 +391,8 @@ do
     spec = {
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
+      { '<leader>a', group = '[A]I (Claude)', mode = { 'n', 'v' } },
+      { '<leader>g', group = '[G]it' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
@@ -705,6 +727,12 @@ do
 
     stylua = {}, -- Used to format Lua code
 
+    -- Homebot stack
+    ruby_lsp = {}, -- Ruby/Rails (mikasa). Needs a Ruby on PATH; installed via asdf.
+    vtsls = {}, -- TypeScript/React (customer-admin, clients-frontend-v2)
+    eslint = {},
+    tailwindcss = {},
+
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
       on_init = function(client)
@@ -766,6 +794,7 @@ do
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
     -- You can add other tools here that you want Mason to install
+    'prettierd', -- fast prettier daemon, used by conform.nvim for JS/TS
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -802,12 +831,14 @@ do
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
-      -- rust = { 'rustfmt' },
-      -- Conform can also run multiple formatters sequentially
-      -- python = { "isort", "black" },
-      --
-      -- You can use 'stop_after_first' to run the first available formatter from the list
-      -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+      typescript = { 'prettierd', 'prettier', stop_after_first = true },
+      typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+      json = { 'prettierd', 'prettier', stop_after_first = true },
+      css = { 'prettierd', 'prettier', stop_after_first = true },
+      -- Ruby intentionally omitted: ruby-lsp formats via the project's RuboCop
+      -- through the `lsp_format = 'fallback'` default above.
     },
   }
 
@@ -910,7 +941,12 @@ do
   vim.pack.add { { src = gh 'nvim-treesitter/nvim-treesitter', version = 'main' } }
 
   -- Ensure basic parsers are installed
-  local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+  local parsers = {
+    'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
+    -- Homebot stack
+    'ruby', 'embedded_template', -- embedded_template covers ERB
+    'javascript', 'typescript', 'tsx', 'css', 'scss', 'json', 'yaml', 'dockerfile', 'sql',
+  }
   require('nvim-treesitter').install(parsers)
 
   ---@param buf integer
@@ -977,12 +1013,10 @@ do
   -- require 'kickstart.plugins.lint'
   -- require 'kickstart.plugins.autopairs'
   -- require 'kickstart.plugins.neo-tree'
-  -- require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps
+  require 'kickstart.plugins.gitsigns' -- adds gitsigns recommended keymaps (hunk nav/stage/reset under <leader>h)
 
-  -- NOTE: You can add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- require 'custom.plugins'
+  -- Josh's own plugins: oil.nvim, fugitive, diffview, claudecode.nvim
+  require 'custom.plugins'
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
