@@ -24,7 +24,8 @@
 -- ============================================================
 
 vim.o.swapfile = false -- old: set noswapfile
-vim.o.wrap = false -- old: set nowrap (Neovim defaults wrap ON, so this matters)
+vim.o.wrap = true
+vim.o.linebreak = true -- wrap at word boundaries instead of mid-word
 
 -- Indentation: 4 spaces by default, which is also what PEP 8 wants for the
 -- Python work.
